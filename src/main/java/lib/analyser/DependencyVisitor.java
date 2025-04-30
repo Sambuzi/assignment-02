@@ -1,8 +1,9 @@
 package lib.analyser;
 
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import lib.report.ClassDepsReport;
 import com.github.javaparser.ast.body.MethodDeclaration;
-//import lib.report.ClassDepsReport;
+
 
 public class DependencyVisitor extends VoidVisitorAdapter<ClassDepsReport> {
     private final String className;
