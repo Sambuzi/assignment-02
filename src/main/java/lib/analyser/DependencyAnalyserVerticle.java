@@ -1,19 +1,38 @@
 package lib.analyser;
 
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Promise;
+import io.vertx.core.*;
+import lib.report.*;
+
+import java.nio.file.Path;
 
 public class DependencyAnalyserVerticle extends AbstractVerticle {
-    private DependencyAnalyserLib analyser;
+
+    private static final String CURRENT_PATH = System.getProperty("user.dir");
+    private static final Path CLASS_PATH = Path.of(CURRENT_PATH, "src", "main", "java", "lib", "report", "ClassDepsReport.java");
+    private static final Path PACKAGE_PATH = Path.of(CURRENT_PATH, "src", "main", "java", "lib", "report");
+    private static final Path PROJECT_PATH = Path.of(CURRENT_PATH);
 
     @Override
     public void start(Promise<Void> startPromise) {
-        analyser = new DependencyAnalyserLib(vertx);
-        System.out.println("DependencyAnalyserVerticle started!");
-        startPromise.complete();
-    }
+        final DependencyAnalyserLib dependencyAnalyser = new DependencyAnalyserLib(this.vertx);
 
-    public DependencyAnalyserLib getAnalyser() {
-        return analyser;
+        // Analisi incrementale: prima classe, poi pacchetto, poi progetto
+        dependencyAnalyser.getClassDependencies(CLASS_PATH)
+                .compose(classReport -> {
+                    System.out.println("Class Report: " + classReport);
+                    return dependencyAnalyser.getPackageDependencies(PACKAGE_PATH);
+                })
+                .compose(packageReport -> {
+                    System.out.println("Package Report: " + packageReport);
+                    return dependencyAnalyser.getProjectDependencies(PROJECT_PATH);
+                })
+                .onSuccess(projectReport -> {
+                    System.out.println("Project Report: " + projectReport);
+                    startPromise.complete();
+                })
+                .onFailure(err -> {
+                    System.err.println("Error: " + err.getMessage());
+                    startPromise.fail(err);
+                });
     }
 }
