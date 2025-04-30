@@ -91,6 +91,7 @@ public class DependencyVisitor extends VoidVisitorAdapter<Void> {
                 ));
             }
         } catch (Exception ignored) {
+            // Ignora eventuali errori di risoluzione del tipo
         }
     }
 
