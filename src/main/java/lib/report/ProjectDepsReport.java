@@ -21,6 +21,12 @@ public class ProjectDepsReport {
 
     @Override
     public String toString() {
-        return "Project: " + projectName + ", Package Reports: " + packageReports;
+        StringBuilder sb = new StringBuilder();
+        sb.append("Project: ").append(projectName).append("\n");
+        sb.append("Package Reports:\n");
+        for (PackageDepsReport report : packageReports) {
+            sb.append(report).append("\n");
+        }
+        return sb.toString();
     }
 }

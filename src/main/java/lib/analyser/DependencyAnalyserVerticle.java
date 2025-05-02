@@ -1,7 +1,6 @@
 package lib.analyser;
 
 import io.vertx.core.*;
-import lib.report.*;
 
 import java.nio.file.Path;
 
@@ -19,15 +18,18 @@ public class DependencyAnalyserVerticle extends AbstractVerticle {
         // Analisi incrementale: prima classe, poi pacchetto, poi progetto
         dependencyAnalyser.getClassDependencies(CLASS_PATH)
                 .compose(classReport -> {
-                    System.out.println("Class Report: " + classReport);
+                    System.out.println("=== Class Report ===");
+                    System.out.println(classReport);
                     return dependencyAnalyser.getPackageDependencies(PACKAGE_PATH);
                 })
                 .compose(packageReport -> {
-                    System.out.println("Package Report: " + packageReport);
+                    System.out.println("=== Package Report ===");
+                    System.out.println(packageReport);
                     return dependencyAnalyser.getProjectDependencies(PROJECT_PATH);
                 })
                 .onSuccess(projectReport -> {
-                    System.out.println("Project Report: " + projectReport);
+                    System.out.println("=== Project Report ===");
+                    System.out.println(projectReport);
                     startPromise.complete();
                 })
                 .onFailure(err -> {

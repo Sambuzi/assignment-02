@@ -23,6 +23,12 @@ public class ClassDepsReport {
 
     @Override
     public String toString() {
-        return "Class: " + className + ", Dependencies: " + dependencies;
+        StringBuilder sb = new StringBuilder();
+        sb.append("Class:").append(className).append("\n");
+        sb.append("Dependencies:\n");
+        for (TypeDependency dep : dependencies) {
+            sb.append("  - ").append(dep.getDependencyType()).append(": ").append(dep.getTargetType()).append("\n");
+        }
+        return sb.toString();
     }
 }
