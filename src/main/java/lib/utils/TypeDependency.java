@@ -50,9 +50,9 @@ public class TypeDependency {
     }
 
     /**
-     * Retrieves the name of the source class.
+     * Retrieves the name of the target class.
      *
-     * @return the name of the source class
+     * @return the name of the target class
      */
     public String getTargetType() {
         return targetType;
