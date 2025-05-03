@@ -14,16 +14,29 @@ import java.util.Collections;
 import java.util.List;
 
 import lib.report.*;
-
+/**
+ * A library for analyzing dependencies in Java projects.
+ * This class provides asynchronous methods to analyze dependencies at the class, package, and project levels.
+ * It uses JavaParser for parsing Java source files and Vert.x for asynchronous programming.
+ */
 public class DependencyAnalyserLib {
     private final Vertx vertx;
     private final JavaParser parser;
-
+    /**
+     * Constructs a new DependencyAnalyserLib instance.
+     *
+     * @param vertx the Vert.x instance used for asynchronous operations
+     */
     public DependencyAnalyserLib(Vertx vertx) {
         this.vertx = vertx;
         this.parser = createJavaParser(new CombinedTypeSolver(new ReflectionTypeSolver(false)));
     }
-
+        /**
+     * Analyzes the dependencies of a single Java class source file asynchronously.
+     *
+     * @param classSrcFile the path to the Java class source file
+     * @return a Future containing the ClassDepsReport with the dependencies of the class
+     */
     public Future<ClassDepsReport> getClassDependencies(Path classSrcFile) {
         Promise<ClassDepsReport> promise = Promise.promise();
 
@@ -53,7 +66,12 @@ public class DependencyAnalyserLib {
 
         return promise.future();
     }
-
+    /**
+     * Analyzes the dependencies of all classes in a package asynchronously.
+     *
+     * @param packageSrcFolder the path to the package source folder
+     * @return a Future containing the PackageDepsReport with the dependencies of the package
+     */
     public Future<PackageDepsReport> getPackageDependencies(Path packageSrcFolder) {
         Promise<PackageDepsReport> promise = Promise.promise();
 
@@ -84,7 +102,12 @@ public class DependencyAnalyserLib {
 
         return promise.future();
     }
-
+    /**
+     * Analyzes the dependencies of all classes in a project asynchronously.
+     *
+     * @param projectSrcFolder the path to the project source folder
+     * @return a Future containing the ProjectDepsReport with the dependencies of the project
+     */
     public Future<ProjectDepsReport> getProjectDependencies(Path projectSrcFolder) {
         Promise<ProjectDepsReport> promise = Promise.promise();
 
@@ -113,13 +136,23 @@ public class DependencyAnalyserLib {
 
         return promise.future();
     }
-
+    /**
+     * Retrieves the main class name from a CompilationUnit.
+     *
+     * @param cu the CompilationUnit representing the parsed Java source file
+     * @return the name of the main class, or "UnknownClass" if not found
+     */
     private String getMainClassName(CompilationUnit cu) {
         return cu.findFirst(ClassOrInterfaceDeclaration.class, c -> !c.isNestedType())
                 .map(ClassOrInterfaceDeclaration::getNameAsString)
                 .orElse("UnknownClass");
     }
-
+    /**
+     * Infers the package name from a directory containing Java source files.
+     *
+     * @param packageDir the directory containing Java source files
+     * @return the inferred package name, or the directory name if not found
+     */
     private String inferPackageName(File packageDir) {
         try {
             File[] javaFiles = packageDir.listFiles((dir, name) -> name.endsWith(".java"));
@@ -134,14 +167,23 @@ public class DependencyAnalyserLib {
         }
         return packageDir.getName();
     }
-
+    /**
+     * Creates a JavaParser instance with a custom type solver.
+     *
+     * @param typeSolver the CombinedTypeSolver to be used by the JavaParser
+     * @return a configured JavaParser instance
+     */
     private JavaParser createJavaParser(CombinedTypeSolver typeSolver) {
         JavaSymbolSolver symbolSolver = new JavaSymbolSolver(typeSolver);
         JavaParser parser = new JavaParser();
         parser.getParserConfiguration().setSymbolResolver(symbolSolver);
         return parser;
     }
-
+    /**
+     * Configures the JavaParser to use the specified source repositories for type resolution.
+     *
+     * @param rootDirs a list of directories containing Java source files
+     */
     private void configureSourceRepositories(List<File> rootDirs) {
         CombinedTypeSolver typeSolver = new CombinedTypeSolver();
         typeSolver.add(new ReflectionTypeSolver(false));
@@ -153,13 +195,23 @@ public class DependencyAnalyserLib {
         JavaSymbolSolver symbolSolver = new JavaSymbolSolver(typeSolver);
         this.parser.getParserConfiguration().setSymbolResolver(symbolSolver);
     }
-
+    /**
+     * Finds all package directories in a project directory.
+     *
+     * @param projectDir the path to the project directory
+     * @return a list of paths to package directories
+     */
     private List<Path> findPackageDirectories(Path projectDir) {
         List<Path> packageDirs = new ArrayList<>();
         findPackageDirsRecursive(projectDir.toFile(), packageDirs);
         return packageDirs;
     }
-
+    /**
+     * Recursively finds package directories in a given directory.
+     *
+     * @param dir the directory to search for package directories
+     * @param packageDirs a list to store the found package directories
+     */
     private void findPackageDirsRecursive(File dir, List<Path> packageDirs) {
         File[] javaFiles = dir.listFiles((d, name) -> name.endsWith(".java"));
         if (javaFiles != null && javaFiles.length > 0) {

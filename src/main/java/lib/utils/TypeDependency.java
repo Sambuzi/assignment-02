@@ -22,7 +22,15 @@ public class TypeDependency {
     private final DependencyType dependencyType; // Tipo di dipendenza (es. IMPORT, EXTENDS)
     private final String codeSnippet; // Anteprima del codice che genera la dipendenza
     private final int lineNumber; // Numero di riga in cui si trova la dipendenza
-
+    /**
+     * Constructs a new TypeDependency with the specified parameters.
+     *
+     * @param sourceType the name of the source class
+     * @param targetType the name of the dependent class
+     * @param dependencyType the type of dependency (e.g., IMPORT, EXTENDS)
+     * @param codeSnippet a preview of the code that generates the dependency
+     * @param lineNumber the line number where the dependency is found
+     */
     public TypeDependency(String sourceType, String targetType, DependencyType dependencyType, String codeSnippet, int lineNumber) {
         this.sourceType = sourceType;
         this.targetType = targetType;
@@ -31,36 +39,56 @@ public class TypeDependency {
         this.lineNumber = lineNumber;
     }
 
-    // Getter per il nome della classe sorgente
+    /**
+     * Retrieves the name of the source class.
+     *
+     * @return the name of the source class
+     */
+
     public String getSourceType() {
         return sourceType;
     }
 
-    // Getter per il nome della classe dipendente
+    /**
+     * Retrieves the name of the source class.
+     *
+     * @return the name of the source class
+     */
     public String getTargetType() {
         return targetType;
     }
-
-    // Getter per il tipo di dipendenza
+    /**
+     * Retrieves the type of dependency.
+     *
+     * @return the type of dependency (e.g., IMPORT, EXTENDS)
+     */
     public DependencyType getDependencyType() {
         return dependencyType;
     }
-
-    // Getter per l'anteprima del codice
+    /**
+     * Retrieves the code snippet that generates the dependency.
+     *
+     * @return a preview of the code that generates the dependency
+     */
     public String getCodeSnippet() {
         return codeSnippet;
     }
-
-    // Getter per il numero di riga
+    /**
+     * Retrieves the line number where the dependency is found.
+     *
+     * @return the line number where the dependency is found
+     */
     public int getLineNumber() {
         return lineNumber;
     }
-
-    // Verifica se è presente un numero di riga valido
+    /**
+     * Checks if the dependency has a line number associated with it.
+     *
+     * @return true if the dependency has a line number, false otherwise
+     */
     public boolean hasLineNumber() {
         return lineNumber > 0;
     }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -77,7 +105,12 @@ public class TypeDependency {
     public int hashCode() {
         return Objects.hash(sourceType, targetType, dependencyType, codeSnippet, lineNumber);
     }
-
+    /**
+     * Generates a string representation of the TypeDependency object.
+     * The output includes the source type, target type, dependency type, and line number (if available).
+     *
+     * @return a formatted string representation of the TypeDependency object
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(sourceType)
