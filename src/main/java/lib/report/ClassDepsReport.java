@@ -2,7 +2,7 @@ package lib.report;
 
 import java.util.HashSet;
 import java.util.Set;
-import lib.utils.TypeDependency;
+import lib.utils.AsyncUtils;
 /**
  * A report class for storing dependencies of a Java class.
  * This class contains the class name and a set of dependencies associated with it.
@@ -13,7 +13,7 @@ import lib.utils.TypeDependency;
  */
 public class ClassDepsReport {
     private final String className;
-    private final Set<TypeDependency> dependencies = new HashSet<>();
+    private final Set<AsyncUtils> dependencies = new HashSet<>();
     /**
      * Constructs a new ClassDepsReport for the specified class.
      *
@@ -27,7 +27,7 @@ public class ClassDepsReport {
      *
      * @param dependency the dependency to add
      */
-    public void addDependency(TypeDependency dependency) {
+    public void addDependency(AsyncUtils dependency) {
         dependencies.add(dependency);
     }
     /**
@@ -35,7 +35,7 @@ public class ClassDepsReport {
      *
      * @return a set of TypeDependency objects representing the dependencies
      */
-    public Set<TypeDependency> getDependencies() {
+    public Set<AsyncUtils> getDependencies() {
         return dependencies;
     }
     /**
@@ -49,7 +49,7 @@ public class ClassDepsReport {
         StringBuilder sb = new StringBuilder();
         sb.append("Class:").append(className).append("\n");
         sb.append("Dependencies:\n");
-        for (TypeDependency dep : dependencies) {
+        for (AsyncUtils dep : dependencies) {
             sb.append("  - ").append(dep.getDependencyType()).append(": ").append(dep.getTargetType()).append("\n");
         }
         return sb.toString();

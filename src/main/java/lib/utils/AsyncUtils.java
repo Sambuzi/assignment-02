@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Represents a dependency between two types in a Java project.
  */
-public class TypeDependency {
+public class AsyncUtils {
 
     public enum DependencyType {
         IMPORT,
@@ -31,7 +31,7 @@ public class TypeDependency {
      * @param codeSnippet a preview of the code that generates the dependency
      * @param lineNumber the line number where the dependency is found
      */
-    public TypeDependency(String sourceType, String targetType, DependencyType dependencyType, String codeSnippet, int lineNumber) {
+    public AsyncUtils(String sourceType, String targetType, DependencyType dependencyType, String codeSnippet, int lineNumber) {
         this.sourceType = sourceType;
         this.targetType = targetType;
         this.dependencyType = dependencyType;
@@ -93,7 +93,7 @@ public class TypeDependency {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        TypeDependency that = (TypeDependency) o;
+        AsyncUtils that = (AsyncUtils) o;
         return lineNumber == that.lineNumber &&
                 Objects.equals(sourceType, that.sourceType) &&
                 Objects.equals(targetType, that.targetType) &&

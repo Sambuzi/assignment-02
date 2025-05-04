@@ -6,9 +6,9 @@ import com.github.javaparser.ast.type.*;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.ast.ImportDeclaration;
 import lib.report.ClassDepsReport;
-import lib.utils.TypeDependency;
+import lib.utils.AsyncUtils;
 import java.util.*;
-import static lib.utils.TypeDependency.DependencyType.*;
+import static lib.utils.AsyncUtils.DependencyType.*;
 /**
  * A visitor for analyzing dependencies in Java classes.
  * This class traverses the Abstract Syntax Tree (AST) of a Java class and identifies
@@ -44,7 +44,7 @@ public class DependencyVisitor extends VoidVisitorAdapter<Void> {
         // Analizza le dipendenze importate
         String importedName = n.getNameAsString();
         if (!n.isStatic() && !importedName.endsWith("*") && shouldExcludeType(importedName)) {
-            report.addDependency(new TypeDependency(
+            report.addDependency(new AsyncUtils(
                     sourceClassName, importedName, IMPORT,
                     "import " + importedName + ";",
                     n.getBegin().map(pos -> pos.line).orElse(-1)
@@ -119,11 +119,11 @@ public class DependencyVisitor extends VoidVisitorAdapter<Void> {
      * @param dependencyType the type of dependency (e.g., IMPORT, EXTENDS)
      * @param description    a description of the dependency
      */
-    private void addDependency(Type type, TypeDependency.DependencyType dependencyType, String description) {
+    private void addDependency(Type type, AsyncUtils.DependencyType dependencyType, String description) {
         try {
             String typeName = resolveTypeName(type);
             if (shouldExcludeType(typeName)) {
-                report.addDependency(new TypeDependency(
+                report.addDependency(new AsyncUtils(
                         sourceClassName, typeName, dependencyType,
                         description + " " + type,
                         type.getBegin().map(pos -> pos.line).orElse(-1)
