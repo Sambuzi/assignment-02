@@ -2,7 +2,7 @@ package gui.components.utils;
 
 import io.reactivex.rxjava3.core.Observable;
 
-import java.io.File;
+import java.io.*;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,12 +28,17 @@ public class ReactiveDependencyAnalyser {
             for (File file : javaFiles) {
                 try {
                     System.out.println("Found file: " + file.getName());
+                    Thread.sleep(300); // per simulare tempo di analisi
 
-                    // Simulazione analisi dipendenze
-                    Thread.sleep(500);
                     String className = file.getName().replace(".java", "");
-                    emitter.onNext(new String[]{className, "Dependency1", "Dependency2"});
-                } catch (InterruptedException e) {
+                    List<String> dependencies = extractImports(file);
+
+                    List<String> output = new ArrayList<>();
+                    output.add(className);
+                    output.addAll(dependencies);
+
+                    emitter.onNext(output.toArray(new String[0]));
+                } catch (Exception e) {
                     emitter.onError(e);
                 }
             }
@@ -53,5 +58,21 @@ public class ReactiveDependencyAnalyser {
                 javaFiles.add(file);
             }
         }
+    }
+
+    private List<String> extractImports(File file) throws IOException {
+        List<String> imports = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (line.startsWith("import ") && line.endsWith(";")) {
+                    String imported = line.substring(7, line.length() - 1); // rimuove "import " e ";"
+                    // Optional: filtra solo classi del progetto se necessario
+                    imports.add(imported);
+                }
+            }
+        }
+        return imports;
     }
 }
