@@ -10,6 +10,7 @@ repositories {
 }
 
 dependencies {
+    implementation("io.reactivex.rxjava3:rxjava:3.1.5") // Solo RxJava, non RxJavaFX
     implementation("com.github.javaparser:javaparser-core:3.25.4")
     implementation("com.github.javaparser:javaparser-symbol-solver-core:3.25.4")
     implementation("io.vertx:vertx-core:4.4.2")
@@ -18,7 +19,7 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
 }
 
-tasks.getByName<Test>("test") {
+tasks.test {
     useJUnitPlatform()
 }
 
