@@ -58,23 +58,35 @@ public class DependencyAnalyserPanel extends JPanel {
 
     private void startAnalysis(JLabel classesLabel, JLabel dependenciesLabel, GraphPanel graphPanel) {
         outputArea.setText("Analisi in corso...\n");
-
+    
         Path path = Paths.get(folderField.getText());
         ReactiveDependencyAnalyser analyser = new ReactiveDependencyAnalyser();
-
+    
         AtomicInteger classCount = new AtomicInteger(0);
         AtomicInteger dependencyCount = new AtomicInteger(0);
-
+    
         analyser.analyzeDependencies(path)
                 .subscribeOn(Schedulers.io())
                 .observeOn(io.reactivex.rxjava3.schedulers.Schedulers.trampoline())
                 .subscribe(
                         deps -> SwingUtilities.invokeLater(() -> {
-                            outputArea.append(String.join(", ", deps) + "\n");
+                            // Formattazione dell'output
+                            StringBuilder formattedOutput = new StringBuilder();
+                            formattedOutput.append("Classe: ").append(deps[0]).append("\n");
+                            formattedOutput.append("Dipendenze:\n");
+                            for (int i = 1; i < deps.length; i++) {
+                                formattedOutput.append("  - ").append(deps[i]).append("\n");
+                            }
+                            formattedOutput.append("\n");
+                            outputArea.append(formattedOutput.toString());
+    
+                            // Aggiornamento del grafo
                             graphPanel.addNode(deps[0]); // Nome della classe
                             for (int i = 1; i < deps.length; i++) {
                                 graphPanel.addEdge(deps[0], deps[i]); // Dipendenze
                             }
+    
+                            // Aggiornamento dei conteggi
                             classCount.incrementAndGet();
                             dependencyCount.addAndGet(deps.length - 1);
                             classesLabel.setText("Classi/Interfacce Analizzate: " + classCount.get());

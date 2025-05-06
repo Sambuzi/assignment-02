@@ -50,7 +50,7 @@ public class GraphPanel extends JPanel {
     private void calculateNodePositions() {
         int centerX = getWidth() / 2;
         int centerY = getHeight() / 2;
-        int radius = Math.min(getWidth(), getHeight()) / 3;
+        int radius = Math.min(getWidth(), getHeight()) / 3 + nodes.size() * 10; // Adjust radius based on number of nodes
 
         int totalNodes = nodes.size();
         for (int i = 0; i < totalNodes; i++) {
