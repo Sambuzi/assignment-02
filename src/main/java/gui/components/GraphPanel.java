@@ -55,8 +55,9 @@ public class GraphPanel extends JPanel {
     private void calculateNodePositions() {
         int centerX = getWidth() / 2;
         int centerY = getHeight() / 2;
-        int radius = Math.min(getWidth(), getHeight()) / 3 + nodes.size() * 10; // Adjust radius based on number of nodes
-
+        int maxRadius = Math.min(getWidth(), getHeight()) / 3; // Limita il raggio massimo
+        int radius = Math.min(maxRadius, 200 + nodes.size() * 5); // Imposta un limite massimo al raggio
+    
         int totalNodes = nodes.size();
         for (int i = 0; i < totalNodes; i++) {
             double angle = 2 * Math.PI * i / totalNodes;
