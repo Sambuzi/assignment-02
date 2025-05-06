@@ -1,14 +1,23 @@
 package gui.components;
 
 import javax.swing.*;
+import java.awt.*;
 
-/**
- * A text area for displaying output or reports.
- */
-public class OutputBox extends JTextArea {
+public class OutputBox extends JPanel {
+    private final JTextArea outputArea;
+
     public OutputBox() {
-        setEditable(false);
-        setLineWrap(true);
-        setWrapStyleWord(true);
+        this.setLayout(new BorderLayout());
+        outputArea = new JTextArea();
+        outputArea.setEditable(false);
+        this.add(new JScrollPane(outputArea), BorderLayout.CENTER);
+    }
+
+    public void appendText(String text) {
+        outputArea.append(text);
+    }
+
+    public void setText(String text) {
+        outputArea.setText(text);
     }
 }
