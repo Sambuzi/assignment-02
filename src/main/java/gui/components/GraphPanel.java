@@ -16,7 +16,7 @@ public class GraphPanel extends JPanel {
     private final Map<String, Point> nodePositions = new HashMap<>();
 
     public GraphPanel() {
-        setPreferredSize(new Dimension(600, 600));
+        setPreferredSize(new Dimension(500, 500));
         setBackground(Color.WHITE);
     }
 
@@ -26,11 +26,16 @@ public class GraphPanel extends JPanel {
      * @param node The name of the node (e.g., class name).
      */
     public void addNode(String node) {
-        if (!nodes.contains(node)) {
-            nodes.add(node);
-            calculateNodePositions(); // Recalculate positions when a new node is added
-            repaint();
+        String packageName = node.contains(".") ? node.substring(0, node.lastIndexOf('.')) : "default";
+        if (!nodes.contains(packageName)) {
+            nodes.add(packageName); // Aggiungi il package come nodo
         }
+        if (!nodes.contains(node)) {
+            nodes.add(node); // Aggiungi la classe come nodo
+            edges.add(new String[]{packageName, node}); // Collega il package alla classe
+        }
+        calculateNodePositions();
+        repaint();
     }
 
     /**

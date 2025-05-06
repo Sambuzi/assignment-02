@@ -92,7 +92,10 @@ public class DependencyAnalyserPanel extends JPanel {
                             classesLabel.setText("Classi/Interfacce Analizzate: " + classCount.get());
                             dependenciesLabel.setText("Dipendenze Trovate: " + dependencyCount.get());
                         }),
-                        error -> SwingUtilities.invokeLater(() -> outputArea.append("Errore: " + error.getMessage() + "\n")),
+                        error -> SwingUtilities.invokeLater(() -> {
+                            outputArea.append("Errore: " + error.getMessage() + "\n");
+                            JOptionPane.showMessageDialog(this, "Errore durante l'analisi: " + error.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
+                        }),
                         () -> SwingUtilities.invokeLater(() -> outputArea.append("Analisi completata.\n"))
                 );
     }
