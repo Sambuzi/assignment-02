@@ -72,10 +72,10 @@ public class GraphPanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-
+    
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        // Draw edges
+    
+        // Disegna gli archi
         g2d.setColor(Color.GRAY);
         for (String[] edge : edges) {
             Point from = nodePositions.get(edge[0]);
@@ -84,33 +84,43 @@ public class GraphPanel extends JPanel {
                 g2d.drawLine(from.x, from.y, to.x, to.y);
             }
         }
-
-        // Draw nodes
+    
+        // Disegna i nodi
         for (String node : nodes) {
             Point position = nodePositions.get(node);
             if (position == null) continue;
-
+    
             int size = 50;
-
+    
             if (packageNodes.contains(node)) {
+                // Disegna il package (rettangolo) con il percorso completo
                 g2d.setColor(new Color(173, 216, 230)); // Light blue for packages
                 g2d.fillRect(position.x - size / 2, position.y - size / 2, size, size);
                 g2d.setColor(Color.BLUE);
                 g2d.drawRect(position.x - size / 2, position.y - size / 2, size, size);
+    
+                // Mostra il percorso completo del package
+                g2d.setColor(Color.BLACK);
+                FontMetrics fm = g2d.getFontMetrics();
+                int labelWidth = fm.stringWidth(node);
+                int labelHeight = fm.getHeight();
+                g2d.drawString(node, position.x - labelWidth / 2, position.y + size / 2 + labelHeight);
             } else {
+                // Disegna la classe (cerchio) con il nome semplice
                 g2d.setColor(Color.LIGHT_GRAY); // Light gray for classes
                 g2d.fillOval(position.x - size / 2, position.y - size / 2, size, size);
                 g2d.setColor(Color.BLACK);
                 g2d.drawOval(position.x - size / 2, position.y - size / 2, size, size);
+    
+                // Estrai solo il nome della classe (senza il percorso completo)
+                String simpleName = node.contains(".") ? node.substring(node.lastIndexOf('.') + 1) : node;
+    
+                g2d.setColor(Color.BLACK);
+                FontMetrics fm = g2d.getFontMetrics();
+                int labelWidth = fm.stringWidth(simpleName);
+                int labelHeight = fm.getHeight();
+                g2d.drawString(simpleName, position.x - labelWidth / 2, position.y + size / 2 + labelHeight);
             }
-
-            g2d.setColor(Color.BLACK);
-            FontMetrics fm = g2d.getFontMetrics();
-            int labelWidth = fm.stringWidth(node);
-            int labelHeight = fm.getHeight();
-
-            // Posiziona il testo leggermente sotto il nodo
-            g2d.drawString(node, position.x - labelWidth / 2, position.y + size / 2 + labelHeight);
         }
     }
 }
