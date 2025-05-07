@@ -8,11 +8,20 @@ import java.awt.*;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * DependencyAnalyserPanel is a custom JPanel that provides a user interface
+ * for analyzing dependencies in a project. It includes a source selector,
+ * an output box for displaying results, and a graph panel for visualizing
+ * the dependency graph.
+ */
 public class DependencyAnalyserPanel extends JPanel {
     private final SourceSelector sourceSelector;
     private final OutputBox outputBox;
     private final GraphPanel graphPanel;
 
+    /**
+     * Constructs a DependencyAnalyserPanel with all its components.
+     */
     public DependencyAnalyserPanel() {
         this.setLayout(new BorderLayout());
 
@@ -20,54 +29,69 @@ public class DependencyAnalyserPanel extends JPanel {
         outputBox = new OutputBox();
         graphPanel = new GraphPanel();
 
-        // Pannello superiore con il selettore e il pulsante
+        // Top panel with the source selector and the analyze button
         JPanel topPanel = new JPanel(new BorderLayout());
-        JButton startButton = new JButton("Analizza");
+        JButton startButton = new JButton("Analyze");
+        startButton.setFont(new Font("SansSerif", Font.BOLD, 14));
+        startButton.setBackground(new Color(60, 179, 113)); // Light green
+        startButton.setForeground(Color.WHITE);
+        startButton.setFocusPainted(false);
+
         topPanel.add(sourceSelector, BorderLayout.CENTER);
         topPanel.add(startButton, BorderLayout.SOUTH);
         this.add(topPanel, BorderLayout.NORTH);
 
-        // Pannello sinistro con l'output
+        // Left panel with the output box
+        JPanel outputPanel = new JPanel(new BorderLayout());
+        JLabel outputHeader = new JLabel("Analysis Output");
+        outputHeader.setFont(new Font("SansSerif", Font.BOLD, 14));
+        outputHeader.setHorizontalAlignment(SwingConstants.CENTER);
+        outputHeader.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        outputPanel.add(outputHeader, BorderLayout.NORTH);
+
         JScrollPane outputScrollPane = new JScrollPane(outputBox);
-        outputScrollPane.setPreferredSize(new Dimension(300, getHeight())); // Dimensione preferita per il pannello di output
-        this.add(outputScrollPane, BorderLayout.WEST);
+        outputScrollPane.setPreferredSize(new Dimension(300, getHeight())); // Preferred size for the output panel
+        outputPanel.add(outputScrollPane, BorderLayout.CENTER);
+        this.add(outputPanel, BorderLayout.WEST);
 
-        // Avvolgi il GraphPanel in uno JScrollPane
-        JScrollPane scrollPane = new JScrollPane(graphPanel);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // Incremento per lo scrolling fluido
-        this.add(scrollPane, BorderLayout.CENTER);
+        // Center panel with the graph panel (no scroll)
+        this.add(graphPanel, BorderLayout.CENTER);
 
-        // Pannello inferiore con la legenda
+        // Bottom panel with the legend and statistics
         JPanel legendPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        legendPanel.add(new JLabel("Legenda:"));
+        legendPanel.add(new JLabel("Legend:"));
         JLabel packageLabel = new JLabel("Package");
         packageLabel.setOpaque(true);
         packageLabel.setBackground(new Color(173, 216, 230)); // Light blue
         legendPanel.add(packageLabel);
 
-        JLabel classLabel = new JLabel("Classe");
+        JLabel classLabel = new JLabel("Class");
         classLabel.setOpaque(true);
         classLabel.setBackground(Color.LIGHT_GRAY); // Light gray
         legendPanel.add(classLabel);
 
-        // Aggiungi etichette per il conteggio di classi e dipendenze
-        JLabel classesLabel = new JLabel("Classi/Interfacce Analizzate: 0");
-        JLabel dependenciesLabel = new JLabel("Dipendenze Trovate: 0");
-        legendPanel.add(Box.createHorizontalStrut(20)); // Spazio tra la legenda e le statistiche
+        // Add labels for class and dependency counts
+        JLabel classesLabel = new JLabel("Classes/Interfaces Analyzed: 0");
+        JLabel dependenciesLabel = new JLabel("Dependencies Found: 0");
+        legendPanel.add(Box.createHorizontalStrut(20)); // Space between legend and statistics
         legendPanel.add(classesLabel);
-        legendPanel.add(Box.createHorizontalStrut(10)); // Spazio tra le statistiche
+        legendPanel.add(Box.createHorizontalStrut(10)); // Space between statistics
         legendPanel.add(dependenciesLabel);
 
         this.add(legendPanel, BorderLayout.SOUTH);
 
-        // Aggiungi azione al pulsante
+        // Add action to the analyze button
         startButton.addActionListener(e -> startAnalysis(classesLabel, dependenciesLabel));
     }
 
+    /**
+     * Starts the dependency analysis process.
+     *
+     * @param classesLabel      The label to update with the number of analyzed classes.
+     * @param dependenciesLabel The label to update with the number of found dependencies.
+     */
     private void startAnalysis(JLabel classesLabel, JLabel dependenciesLabel) {
-        outputBox.setText("Analisi in corso...\n");
+        outputBox.setText("Analysis in progress...\n");
 
         Path path = Path.of(sourceSelector.getSelectedPath());
         ReactiveDependencyAnalyser analyser = new ReactiveDependencyAnalyser();
@@ -81,8 +105,8 @@ public class DependencyAnalyserPanel extends JPanel {
                 .subscribe(
                         deps -> SwingUtilities.invokeLater(() -> {
                             StringBuilder formattedOutput = new StringBuilder();
-                            formattedOutput.append("Classe: ").append(deps[0]).append("\n");
-                            formattedOutput.append("Dipendenze:\n");
+                            formattedOutput.append("Class: ").append(deps[0]).append("\n");
+                            formattedOutput.append("Dependencies:\n");
                             for (int i = 1; i < deps.length; i++) {
                                 formattedOutput.append("  - ").append(deps[i]).append("\n");
                             }
@@ -96,14 +120,14 @@ public class DependencyAnalyserPanel extends JPanel {
 
                             classCount.incrementAndGet();
                             dependencyCount.addAndGet(deps.length - 1);
-                            classesLabel.setText("Classi/Interfacce Analizzate: " + classCount.get());
-                            dependenciesLabel.setText("Dipendenze Trovate: " + dependencyCount.get());
+                            classesLabel.setText("Classes/Interfaces Analyzed: " + classCount.get());
+                            dependenciesLabel.setText("Dependencies Found: " + dependencyCount.get());
                         }),
                         error -> SwingUtilities.invokeLater(() -> {
-                            outputBox.appendText("Errore: " + error.getMessage() + "\n");
-                            JOptionPane.showMessageDialog(this, "Errore durante l'analisi: " + error.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
+                            outputBox.appendText("Error: " + error.getMessage() + "\n");
+                            JOptionPane.showMessageDialog(this, "Error during analysis: " + error.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                         }),
-                        () -> SwingUtilities.invokeLater(() -> outputBox.appendText("Analisi completata.\n"))
+                        () -> SwingUtilities.invokeLater(() -> outputBox.appendText("Analysis completed.\n"))
                 );
     }
 }
