@@ -37,15 +37,13 @@ public class GraphPanel extends JPanel {
     }
 
     private void calculateNodePositions() {
-        int yOffset = 150; // Distanza verticale tra i grafi
-        int packageX = getWidth() / 2; // Posizione orizzontale centrale
+        int yOffset = 200; // Distanza verticale tra i package
+        int xOffset = 150; // Distanza orizzontale tra i nodi
         int packageY = yOffset; // Posizione verticale iniziale
-
-        int classRadius = 100; // Raggio per le classi all'interno di un package
 
         for (String packageName : packageNodes) {
             // Posizionamento del package
-            nodePositions.put(packageName, new Point(packageX, packageY));
+            nodePositions.put(packageName, new Point(xOffset, packageY));
 
             // Posizionamento delle classi all'interno del package
             List<String> classNodes = new ArrayList<>();
@@ -55,20 +53,18 @@ public class GraphPanel extends JPanel {
                 }
             }
 
-            int totalClasses = classNodes.size();
-            for (int i = 0; i < totalClasses; i++) {
-                double angle = 2 * Math.PI * i / totalClasses;
-                int x = (int) (packageX + classRadius * Math.cos(angle));
-                int y = (int) (packageY + classRadius * Math.sin(angle));
-                nodePositions.put(classNodes.get(i), new Point(x, y));
+            int classX = xOffset + 200; // Posizione iniziale delle classi
+            for (String classNode : classNodes) {
+                nodePositions.put(classNode, new Point(classX, packageY));
+                classX += xOffset; // Sposta il prossimo nodo a destra
             }
 
             // Incrementa la posizione verticale per il prossimo package
-            packageY += yOffset + classRadius * 2;
+            packageY += yOffset;
         }
 
         // Aggiorna la dimensione preferita del pannello per abilitare lo scrolling
-        setPreferredSize(new Dimension(getWidth(), packageY));
+        setPreferredSize(new Dimension(Math.max(getWidth(), xOffset * 10), packageY));
         revalidate(); // Assicurati che il pannello venga aggiornato
     }
 

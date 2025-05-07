@@ -9,7 +9,7 @@ public class MainGUI {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Reactive Dependency Analyser");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(950, 700);
+            frame.setSize(1000, 800);
             frame.setLocationRelativeTo(null);
 
             DependencyAnalyserPanel analyserPanel = new DependencyAnalyserPanel();

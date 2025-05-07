@@ -20,28 +20,49 @@ public class DependencyAnalyserPanel extends JPanel {
         outputBox = new OutputBox();
         graphPanel = new GraphPanel();
 
+        // Pannello superiore con il selettore e il pulsante
         JPanel topPanel = new JPanel(new BorderLayout());
         JButton startButton = new JButton("Analizza");
         topPanel.add(sourceSelector, BorderLayout.CENTER);
         topPanel.add(startButton, BorderLayout.SOUTH);
-
         this.add(topPanel, BorderLayout.NORTH);
-        this.add(outputBox, BorderLayout.CENTER);
+
+        // Pannello sinistro con l'output
+        JScrollPane outputScrollPane = new JScrollPane(outputBox);
+        outputScrollPane.setPreferredSize(new Dimension(300, getHeight())); // Dimensione preferita per il pannello di output
+        this.add(outputScrollPane, BorderLayout.WEST);
 
         // Avvolgi il GraphPanel in uno JScrollPane
         JScrollPane scrollPane = new JScrollPane(graphPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16); // Incremento per lo scrolling fluido
-        this.add(scrollPane, BorderLayout.EAST);
+        this.add(scrollPane, BorderLayout.CENTER);
 
-        JPanel statsPanel = new JPanel(new GridLayout(1, 2));
-        JLabel classesLabel = new JLabel("Classi/Interfacce Analizzate:");
-        JLabel dependenciesLabel = new JLabel("Dipendenze Trovate:");
-        statsPanel.add(classesLabel);
-        statsPanel.add(dependenciesLabel);
-        this.add(statsPanel, BorderLayout.SOUTH);
+        // Pannello inferiore con la legenda
+        JPanel legendPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        legendPanel.add(new JLabel("Legenda:"));
+        JLabel packageLabel = new JLabel("Package");
+        packageLabel.setOpaque(true);
+        packageLabel.setBackground(new Color(173, 216, 230)); // Light blue
+        legendPanel.add(packageLabel);
 
+        JLabel classLabel = new JLabel("Classe");
+        classLabel.setOpaque(true);
+        classLabel.setBackground(Color.LIGHT_GRAY); // Light gray
+        legendPanel.add(classLabel);
+
+        // Aggiungi etichette per il conteggio di classi e dipendenze
+        JLabel classesLabel = new JLabel("Classi/Interfacce Analizzate: 0");
+        JLabel dependenciesLabel = new JLabel("Dipendenze Trovate: 0");
+        legendPanel.add(Box.createHorizontalStrut(20)); // Spazio tra la legenda e le statistiche
+        legendPanel.add(classesLabel);
+        legendPanel.add(Box.createHorizontalStrut(10)); // Spazio tra le statistiche
+        legendPanel.add(dependenciesLabel);
+
+        this.add(legendPanel, BorderLayout.SOUTH);
+
+        // Aggiungi azione al pulsante
         startButton.addActionListener(e -> startAnalysis(classesLabel, dependenciesLabel));
     }
 
