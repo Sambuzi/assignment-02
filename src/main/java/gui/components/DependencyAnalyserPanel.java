@@ -92,39 +92,46 @@ public class DependencyAnalyserPanel extends JPanel {
      */
     private void startAnalysis(JLabel classesLabel, JLabel dependenciesLabel) {
         outputBox.setText("Analysis in progress...\n");
-
+    
         Path path = Path.of(sourceSelector.getSelectedPath());
         ReactiveDependencyAnalyser analyser = new ReactiveDependencyAnalyser();
-
+    
         AtomicInteger classCount = new AtomicInteger(0);
         AtomicInteger dependencyCount = new AtomicInteger(0);
-
+    
         analyser.analyzeDependencies(path)
                 .subscribeOn(Schedulers.io())
                 .observeOn(io.reactivex.rxjava3.schedulers.Schedulers.trampoline())
                 .subscribe(
                         deps -> SwingUtilities.invokeLater(() -> {
-                            StringBuilder formattedOutput = new StringBuilder();
-                            formattedOutput.append("Class: ").append(deps[0]).append("\n");
-                            formattedOutput.append("Dependencies:\n");
+                            // Clear the output box for new results
+                            outputBox.appendText("\n");
+    
+                            // Draw "Class:" in red
+                            outputBox.appendColoredText("Class: ", Color.RED);
+                            outputBox.appendText(deps[0] + "\n");
+    
+                            // Draw "Dependencies:" in red
+                            outputBox.appendColoredText("Dependencies:\n", Color.RED);
                             for (int i = 1; i < deps.length; i++) {
-                                formattedOutput.append("  - ").append(deps[i]).append("\n");
+                                outputBox.appendText("  - " + deps[i] + "\n");
                             }
-                            formattedOutput.append("\n");
-                            outputBox.appendText(formattedOutput.toString());
-
+    
+                            // Add a blank line for separation
+                            outputBox.appendText("\n");
+    
                             graphPanel.addNode(deps[0]);
                             for (int i = 1; i < deps.length; i++) {
                                 graphPanel.addEdge(deps[0], deps[i]);
                             }
-
+    
                             classCount.incrementAndGet();
                             dependencyCount.addAndGet(deps.length - 1);
                             classesLabel.setText("Classes/Interfaces Analyzed: " + classCount.get());
                             dependenciesLabel.setText("Dependencies Found: " + dependencyCount.get());
                         }),
                         error -> SwingUtilities.invokeLater(() -> {
-                            outputBox.appendText("Error: " + error.getMessage() + "\n");
+                            outputBox.appendColoredText("Error: " + error.getMessage() + "\n", Color.RED);
                             JOptionPane.showMessageDialog(this, "Error during analysis: " + error.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                         }),
                         () -> SwingUtilities.invokeLater(() -> outputBox.appendText("Analysis completed.\n"))
