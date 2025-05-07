@@ -2,75 +2,81 @@ package gui.components;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
-/**
- * A panel for displaying graphical representations of dependencies.
- */
 public class GraphPanel extends JPanel {
     private final List<String> nodes = new ArrayList<>();
     private final List<String[]> edges = new ArrayList<>();
     private final Map<String, Point> nodePositions = new HashMap<>();
+    private final Set<String> packageNodes = new HashSet<>();
 
     public GraphPanel() {
         setPreferredSize(new Dimension(500, 500));
         setBackground(Color.WHITE);
     }
 
-    /**
-     * Adds a node to the graph.
-     *
-     * @param node The name of the node (e.g., class name).
-     */
     public void addNode(String node) {
         String packageName = node.contains(".") ? node.substring(0, node.lastIndexOf('.')) : "default";
         if (!nodes.contains(packageName)) {
-            nodes.add(packageName); // Aggiungi il package come nodo
+            nodes.add(packageName);
+            packageNodes.add(packageName);
         }
         if (!nodes.contains(node)) {
-            nodes.add(node); // Aggiungi la classe come nodo
-            edges.add(new String[]{packageName, node}); // Collega il package alla classe
+            nodes.add(node);
+            edges.add(new String[]{packageName, node});
         }
         calculateNodePositions();
         repaint();
     }
 
-    /**
-     * Adds an edge between two nodes.
-     *
-     * @param from The starting node.
-     * @param to   The ending node.
-     */
     public void addEdge(String from, String to) {
         edges.add(new String[]{from, to});
+        calculateNodePositions();
         repaint();
     }
 
-    /**
-     * Calculates positions for nodes in a circular layout.
-     */
     private void calculateNodePositions() {
-        int centerX = getWidth() / 2;
-        int centerY = getHeight() / 2;
-        int maxRadius = Math.min(getWidth(), getHeight()) / 3; // Limita il raggio massimo
-        int radius = Math.min(maxRadius, 200 + nodes.size() * 5); // Imposta un limite massimo al raggio
-    
-        int totalNodes = nodes.size();
-        for (int i = 0; i < totalNodes; i++) {
-            double angle = 2 * Math.PI * i / totalNodes;
-            int x = (int) (centerX + radius * Math.cos(angle));
-            int y = (int) (centerY + radius * Math.sin(angle));
-            nodePositions.put(nodes.get(i), new Point(x, y));
+        int yOffset = 150; // Distanza verticale tra i grafi
+        int packageX = getWidth() / 2; // Posizione orizzontale centrale
+        int packageY = yOffset; // Posizione verticale iniziale
+
+        int classRadius = 100; // Raggio per le classi all'interno di un package
+
+        for (String packageName : packageNodes) {
+            // Posizionamento del package
+            nodePositions.put(packageName, new Point(packageX, packageY));
+
+            // Posizionamento delle classi all'interno del package
+            List<String> classNodes = new ArrayList<>();
+            for (String node : nodes) {
+                if (!packageNodes.contains(node) && node.startsWith(packageName)) {
+                    classNodes.add(node);
+                }
+            }
+
+            int totalClasses = classNodes.size();
+            for (int i = 0; i < totalClasses; i++) {
+                double angle = 2 * Math.PI * i / totalClasses;
+                int x = (int) (packageX + classRadius * Math.cos(angle));
+                int y = (int) (packageY + classRadius * Math.sin(angle));
+                nodePositions.put(classNodes.get(i), new Point(x, y));
+            }
+
+            // Incrementa la posizione verticale per il prossimo package
+            packageY += yOffset + classRadius * 2;
         }
+
+        // Aggiorna la dimensione preferita del pannello per abilitare lo scrolling
+        setPreferredSize(new Dimension(getWidth(), packageY));
+        revalidate(); // Assicurati che il pannello venga aggiornato
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
+
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         // Draw edges
@@ -84,23 +90,31 @@ public class GraphPanel extends JPanel {
         }
 
         // Draw nodes
-        g2d.setColor(Color.LIGHT_GRAY);
-        for (Map.Entry<String, Point> entry : nodePositions.entrySet()) {
-            Point position = entry.getValue();
-            String node = entry.getKey();
+        for (String node : nodes) {
+            Point position = nodePositions.get(node);
+            if (position == null) continue;
 
-            // Draw node circle
-            int nodeSize = 50;
-            g2d.fillOval(position.x - nodeSize / 2, position.y - nodeSize / 2, nodeSize, nodeSize);
+            int size = 50;
+
+            if (packageNodes.contains(node)) {
+                g2d.setColor(new Color(173, 216, 230)); // Light blue for packages
+                g2d.fillRect(position.x - size / 2, position.y - size / 2, size, size);
+                g2d.setColor(Color.BLUE);
+                g2d.drawRect(position.x - size / 2, position.y - size / 2, size, size);
+            } else {
+                g2d.setColor(Color.LIGHT_GRAY); // Light gray for classes
+                g2d.fillOval(position.x - size / 2, position.y - size / 2, size, size);
+                g2d.setColor(Color.BLACK);
+                g2d.drawOval(position.x - size / 2, position.y - size / 2, size, size);
+            }
+
             g2d.setColor(Color.BLACK);
-            g2d.drawOval(position.x - nodeSize / 2, position.y - nodeSize / 2, nodeSize, nodeSize);
-
-            // Draw node label
             FontMetrics fm = g2d.getFontMetrics();
             int labelWidth = fm.stringWidth(node);
-            g2d.drawString(node, position.x - labelWidth / 2, position.y + fm.getAscent() / 2);
+            int labelHeight = fm.getHeight();
 
-            g2d.setColor(Color.LIGHT_GRAY);
+            // Posiziona il testo leggermente sotto il nodo
+            g2d.drawString(node, position.x - labelWidth / 2, position.y + size / 2 + labelHeight);
         }
     }
 }

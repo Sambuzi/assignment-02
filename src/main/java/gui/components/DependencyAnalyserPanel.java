@@ -27,7 +27,13 @@ public class DependencyAnalyserPanel extends JPanel {
 
         this.add(topPanel, BorderLayout.NORTH);
         this.add(outputBox, BorderLayout.CENTER);
-        this.add(graphPanel, BorderLayout.EAST);
+
+        // Avvolgi il GraphPanel in uno JScrollPane
+        JScrollPane scrollPane = new JScrollPane(graphPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // Incremento per lo scrolling fluido
+        this.add(scrollPane, BorderLayout.EAST);
 
         JPanel statsPanel = new JPanel(new GridLayout(1, 2));
         JLabel classesLabel = new JLabel("Classi/Interfacce Analizzate:");

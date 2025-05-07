@@ -30,7 +30,7 @@ public class ReactiveDependencyAnalyser {
                     System.out.println("Found file: " + file.getName());
                     Thread.sleep(300); // per simulare tempo di analisi
 
-                    String className = file.getName().replace(".java", "");
+                    String className = extractFullClassName(file);
                     List<String> dependencies = extractImports(file);
 
                     List<String> output = new ArrayList<>();
@@ -75,4 +75,20 @@ public class ReactiveDependencyAnalyser {
         }
         return imports;
     }
+    private String extractFullClassName(File file) throws IOException {
+        String className = file.getName().replace(".java", "");
+        String packageName = "default";
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (line.startsWith("package ")) {
+                    packageName = line.substring(8, line.indexOf(';')).trim();
+                    break;
+                }
+            }
+        }
+        return packageName + "." + className;
+    }
+    
 }
