@@ -98,44 +98,42 @@ public class GraphPanel extends JPanel {
         nodePositions.clear();
         int width = getWidth();
         int height = getHeight();
-
+    
+        // Posizionamento dei pacchetti in un cerchio
         int packageCount = packageNodes.size();
-        int columns = (int) Math.ceil(Math.sqrt(packageCount));
-        int rows = (int) Math.ceil((double) packageCount / columns);
-        int cellWidth = width / columns;
-        int cellHeight = height / rows;
-
+        int packageRadius = Math.min(width, height) / 3;
+    
         List<String> packageList = new ArrayList<>(packageNodes);
         for (int i = 0; i < packageList.size(); i++) {
-            int row = i / columns;
-            int col = i % columns;
-            int x = col * cellWidth + cellWidth / 2;
-            int y = row * cellHeight + cellHeight / 4;
+            double angle = 2 * Math.PI * i / packageCount;
+            int x = (int) (width / 2 + packageRadius * Math.cos(angle));
+            int y = (int) (height / 2 + packageRadius * Math.sin(angle));
             nodePositions.put(packageList.get(i), new Point(x, y));
         }
-
+    
+        // Posizionamento delle classi in una griglia attorno al pacchetto
+        int gridSpacing = 80; // Spaziatura tra i nodi della griglia
         for (String pkg : packageNodes) {
+            Point packageCenter = nodePositions.get(pkg);
+            if (packageCenter == null) continue;
+    
             List<String> classNodes = new ArrayList<>();
             for (String node : nodes) {
                 if (!packageNodes.contains(node) && node.startsWith(pkg)) {
                     classNodes.add(node);
                 }
             }
-
+    
             int classCount = classNodes.size();
-            if (classCount == 0) continue;
-
-            Point center = nodePositions.get(pkg);
-            int gridSize = (int) Math.ceil(Math.sqrt(classCount));
-            int spacing = 80;
-            int startX = center.x - (gridSize * spacing) / 2;
-            int startY = center.y + 100;
-
+            int gridSize = (int) Math.ceil(Math.sqrt(classCount)); // Dimensione della griglia (es. 3x3 per 9 nodi)
+            int startX = packageCenter.x - (gridSize * gridSpacing) / 2;
+            int startY = packageCenter.y + 100; // Posiziona la griglia sotto il pacchetto
+    
             for (int i = 0; i < classCount; i++) {
                 int row = i / gridSize;
                 int col = i % gridSize;
-                int x = startX + col * spacing;
-                int y = startY + row * spacing;
+                int x = startX + col * gridSpacing;
+                int y = startY + row * gridSpacing;
                 nodePositions.put(classNodes.get(i), new Point(x, y));
             }
         }
