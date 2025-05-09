@@ -57,7 +57,7 @@ public class DependencyAnalyserLib {
         Promise<R> promise = Promise.promise();
         File[] files = listFiles(folder, ".java");
         if (files == null || files.length == 0) {
-            promise.complete(reportConstructor.apply(folder.getFileName().toString()));
+            promise.complete(reportConstructor.apply(folder.getFileName() != null ? folder.getFileName().toString() : "UnknownFolder"));
             return promise.future();
         }
 
@@ -65,7 +65,7 @@ public class DependencyAnalyserLib {
         for (File file : files) futures.add(processor.apply(file.toPath()));
 
         CompositeFuture.all(futures).onSuccess(result -> {
-            R report = reportConstructor.apply(folder.getFileName().toString());
+            R report = reportConstructor.apply(folder.getFileName() != null ? folder.getFileName().toString() : "UnknownFolder");
             for (int i = 0; i < result.size(); i++) addToReport(report, result.resultAt(i));
             promise.complete(report);
         }).onFailure(promise::fail);
@@ -76,10 +76,19 @@ public class DependencyAnalyserLib {
     private <T, R> Future<R> processFolders(List<Path> folders, Function<Path, Future<T>> processor, Function<String, R> reportConstructor) {
         Promise<R> promise = Promise.promise();
         List<Future> futures = new ArrayList<>();
-        for (Path folder : folders) futures.add(processor.apply(folder));
+        for (Path folder : folders) {
+            if (folder == null || folder.getFileName() == null) {
+                System.err.println("Invalid folder path: " + folder);
+                continue; // Skip invalid paths
+            }
+            futures.add(processor.apply(folder));
+        }
 
         CompositeFuture.all(futures).onSuccess(result -> {
-            R report = reportConstructor.apply(folders.get(0).getParent().getFileName().toString());
+            String parentName = folders.get(0).getParent() != null && folders.get(0).getParent().getFileName() != null
+                    ? folders.get(0).getParent().getFileName().toString()
+                    : "UnknownParent";
+            R report = reportConstructor.apply(parentName);
             for (int i = 0; i < result.size(); i++) addToReport(report, result.resultAt(i));
             promise.complete(report);
         }).onFailure(promise::fail);
