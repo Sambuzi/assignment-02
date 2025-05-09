@@ -20,7 +20,6 @@ public class DependencyAnalyserVerticle extends AbstractVerticle {
     @Override
     public void start(Promise<Void> startPromise) {
         final DependencyAnalyserLib dependencyAnalyser = new DependencyAnalyserLib(this.vertx);
-        // Analisi incrementale: prima classe, poi pacchetto, poi progetto
         dependencyAnalyser.getClassDependencies(CLASS_PATH)
                 .compose(classReport -> {
                     System.out.println("=== Class Report ===");

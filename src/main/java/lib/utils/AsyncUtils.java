@@ -17,11 +17,11 @@ public class AsyncUtils {
         METHOD_RETURN
     }
 
-    private final String sourceType; // Nome della classe sorgente
-    private final String targetType; // Nome della classe dipendente
-    private final DependencyType dependencyType; // Tipo di dipendenza (es. IMPORT, EXTENDS)
-    private final String codeSnippet; // Anteprima del codice che genera la dipendenza
-    private final int lineNumber; // Numero di riga in cui si trova la dipendenza
+    private final String sourceType;
+    private final String targetType;
+    private final DependencyType dependencyType;
+    private final String codeSnippet;
+    private final int lineNumber;
     /**
      * Constructs a new TypeDependency with the specified parameters.
      *
