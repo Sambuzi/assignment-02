@@ -37,10 +37,17 @@ public class DependencyAnalyserPanel extends JPanel {
         startButton.setForeground(Color.WHITE);
         startButton.setFocusPainted(false);
 
+        JButton exitButton = new JButton("Exit");
+        exitButton.setFont(new Font("SansSerif", Font.BOLD, 14));
+        exitButton.setBackground(new Color(255, 69, 0)); // Red
+        exitButton.setForeground(Color.WHITE);
+        exitButton.setFocusPainted(false);
+        exitButton.addActionListener(e -> System.exit(0)); // Exit the application
+
         topPanel.add(sourceSelector, BorderLayout.CENTER);
         topPanel.add(startButton, BorderLayout.SOUTH);
         this.add(topPanel, BorderLayout.NORTH);
-
+        topPanel.add(exitButton, BorderLayout.EAST); // Add exit button to the top panel
         // Left panel with the output box
         JPanel outputPanel = new JPanel(new BorderLayout());
         JLabel outputHeader = new JLabel("Analysis Output");
