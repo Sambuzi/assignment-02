@@ -61,7 +61,8 @@ public class DependencyAnalyserLib {
      * Analyzes the dependencies of all packages in a project.
      *
      * @param projectSrcFolder The path to the project folder.
-     * @return A future containing the project dependency report.
+     * @return A future containing the project dependency r
+     * eport.
      */
     public Future<ProjectDepsReport> getProjectDependencies(Path projectSrcFolder) {
         String projectName = projectSrcFolder.getFileName() != null
